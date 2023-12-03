@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {Text, TextInput, View, Button, StyleSheet, Alert, ScrollView, FlatList} from 'react-native';
+import {Text, TextInput, View, Button, StyleSheet, ScrollView} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Calculator = () => {
   const [text, setText] = useState('')
   const [result, setResult] = useState('')
   const [history, setHistory] = useState('')
+  const [search, setSearch] = useState('')
+  const [searchResult, setSResult] = useState('')
 
   cal = (text) => {
     try {
@@ -17,6 +19,18 @@ const Calculator = () => {
     } catch (error) {
       return ''
     }
+  }
+
+  find = (search) => {
+    spec = ["+", "-", "*", "/", "."]
+    for(i = 0; i<spec.length; i++)
+      if(spec[i]==search) {
+        search = "\\" + search
+        break
+      }
+
+    pattern = new RegExp(".*" + search + '.*\n', 'g')
+    setSResult(history.match(pattern))
   }
 
   const save = async (value) => {
@@ -66,6 +80,20 @@ const Calculator = () => {
         onPress={() => clearHistory()}
         title='Xoá lịch sử'>
       </Button>
+      <ScrollView style={styles.historyBox}>
+        <Text>{searchResult}</Text>
+      </ScrollView>
+      <Button
+        onPress={() => find(search)}
+        title='Tìm kiếm'>
+      </Button>
+      <TextInput
+        style={styles.inputBox}
+        placeholder="Nhập tìm kiếm"
+        multiline={true}
+        onChangeText={setSearch}
+        defaultValue={search}
+      />
       <Text></Text>
       <Button
         onPress={() => cal(text)}
@@ -103,5 +131,6 @@ const styles = StyleSheet.create({
   },
   historyBox: {
     borderWidth: 4,
+    height: "30%"
   }, 
 });
